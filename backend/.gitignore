@@ -1,0 +1,13 @@
+node_modules
+
+# Environment variables
+.env
+
+# Generated Prisma client
+/src/generated/prisma
+
+# Local AI/editor tooling
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
