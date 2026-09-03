@@ -1,6 +1,8 @@
+
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.js";
+import { createAuditLog } from "./audit.service.js";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const JWT_2FA_SECRET = process.env.JWT_2FA_SECRET;
@@ -18,7 +20,6 @@ interface AccessTokenPayload {
   role: string;
 }
 
-
 export const generateAccessToken = (
   payload: AccessTokenPayload
 ) => {
@@ -26,7 +27,6 @@ export const generateAccessToken = (
     expiresIn: "15m",
   });
 };
-
 
 export const generateRefreshToken = async (
   userId: string
@@ -52,7 +52,6 @@ export const generateRefreshToken = async (
   return refreshToken;
 };
 
-
 export const refreshAccessToken = async (
   refreshToken: string
 ) => {
@@ -74,9 +73,23 @@ export const refreshAccessToken = async (
     throw new Error("Invalid refresh token");
   }
 
+  /*
+   * A revoked token with a replacement indicates that
+   * the token was already successfully rotated.
+   *
+   * Presenting it again means the old refresh token
+   * has been reused.
+   */
   if (storedToken.revoked) {
-    throw new Error("Refresh token has been revoked");
+  if (storedToken.replacedByTokenId) {
+    await createAuditLog({
+      userId: storedToken.userId,
+      action: "REFRESH_TOKEN_REUSE_DETECTED",
+    });
   }
+
+  throw new Error("Refresh token has been revoked");
+}
 
   if (storedToken.expiresAt < new Date()) {
     throw new Error("Refresh token has expired");
@@ -86,32 +99,54 @@ export const refreshAccessToken = async (
     throw new Error("User account is inactive");
   }
 
+  /*
+   * Create the new refresh token first so that
+   * the old token can point to the replacement.
+   */
+  const newRefreshToken = crypto.randomBytes(64).toString("hex");
+
+  const newTokenHash = crypto
+    .createHash("sha256")
+    .update(newRefreshToken)
+    .digest("hex");
+
+  const newExpiresAt = new Date();
+  newExpiresAt.setDate(newExpiresAt.getDate() + 7);
+
+  const newStoredToken = await prisma.refreshToken.create({
+    data: {
+      userId: storedToken.user.id,
+      tokenHash: newTokenHash,
+      expiresAt: newExpiresAt,
+    },
+  });
+
+  /*
+   * Rotate the old token.
+   *
+   * The old token is permanently revoked and records
+   * which token replaced it.
+   */
   await prisma.refreshToken.update({
     where: {
       id: storedToken.id,
     },
     data: {
       revoked: true,
+      replacedByTokenId: newStoredToken.id,
     },
   });
 
-  // Generate a new access token.
   const newAccessToken = generateAccessToken({
     userId: storedToken.user.id,
     role: storedToken.user.role,
   });
-
-  // Generate a new refresh token.
-  const newRefreshToken = await generateRefreshToken(
-    storedToken.user.id
-  );
 
   return {
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
   };
 };
-
 
 export const revokeRefreshToken = async (
   refreshToken: string
@@ -145,7 +180,6 @@ export const revokeRefreshToken = async (
   });
 };
 
-
 export const generateTwoFactorToken = (
   userId: string
 ) => {
@@ -160,3 +194,4 @@ export const generateTwoFactorToken = (
     }
   );
 };
+

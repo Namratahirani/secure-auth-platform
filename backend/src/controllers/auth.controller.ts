@@ -209,10 +209,11 @@ export const refreshToken = async (
   } catch (error) {
     if (error instanceof Error) {
       if (
-        error.message === "Invalid refresh token" ||
-        error.message === "Refresh token has been revoked" ||
-        error.message === "Refresh token has expired"
-      ) {
+  error.message === "Invalid refresh token" ||
+  error.message === "Refresh token has been revoked" ||
+  error.message === "Refresh token has expired" ||
+  error.message === "Refresh token reuse detected"
+) {
         return res.status(401).json({
           message: error.message,
         });
