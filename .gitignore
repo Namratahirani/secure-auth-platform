@@ -143,3 +143,5 @@ vite.config.ts.timestamp-*
 .vite/
 
 .vscode/
+
+PROOF_OF_SUBMISSION/proof_private.pem
