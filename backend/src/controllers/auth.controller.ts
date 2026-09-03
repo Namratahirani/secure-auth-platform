@@ -144,9 +144,11 @@ export const login = async (
       role: user.role,
     });
 
-    const refreshToken = await generateRefreshToken(
-      user.id
-    );
+   const refreshToken = await generateRefreshToken(
+  user.id,
+  req.get("user-agent"),
+  req.ip
+);
 
     await createAuditLog({
       userId: user.id,

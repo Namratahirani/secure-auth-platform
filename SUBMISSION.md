@@ -164,6 +164,13 @@ The project includes:
 * Protected API endpoints
 * Active-user checks for protected authentication flows
 
+### Bonus Security Features
+
+- Refresh token rotation
+- Refresh token reuse detection
+- Automatic revocation of token chains after reuse attempts
+- Audit logging of authentication events
+
 ## Automated Tests
 
 The backend contains automated tests covering the main authentication flows, including registration, login, two-factor authentication, token refresh, forgot-password, and password-reset functionality.

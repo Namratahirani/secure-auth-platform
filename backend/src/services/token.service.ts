@@ -29,7 +29,9 @@ export const generateAccessToken = (
 };
 
 export const generateRefreshToken = async (
-  userId: string
+  userId: string,
+  deviceInfo?: string,
+  ipAddress?: string
 ) => {
   const refreshToken = crypto.randomBytes(64).toString("hex");
 
@@ -46,12 +48,13 @@ export const generateRefreshToken = async (
       userId,
       tokenHash,
       expiresAt,
+      deviceInfo,
+      ipAddress,
     },
   });
 
   return refreshToken;
 };
-
 export const refreshAccessToken = async (
   refreshToken: string
 ) => {
@@ -114,19 +117,16 @@ export const refreshAccessToken = async (
   newExpiresAt.setDate(newExpiresAt.getDate() + 7);
 
   const newStoredToken = await prisma.refreshToken.create({
-    data: {
-      userId: storedToken.user.id,
-      tokenHash: newTokenHash,
-      expiresAt: newExpiresAt,
-    },
-  });
+  data: {
+    userId: storedToken.user.id,
+    tokenHash: newTokenHash,
+    expiresAt: newExpiresAt,
+    deviceInfo: storedToken.deviceInfo,
+    ipAddress: storedToken.ipAddress,
+  },
+});
 
-  /*
-   * Rotate the old token.
-   *
-   * The old token is permanently revoked and records
-   * which token replaced it.
-   */
+  
   await prisma.refreshToken.update({
     where: {
       id: storedToken.id,
