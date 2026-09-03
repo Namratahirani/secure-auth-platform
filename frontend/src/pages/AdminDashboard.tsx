@@ -7,9 +7,7 @@ import "../App.css";
 interface AdminUser {
   id: string;
   email: string;
-  phone: string;
   role: "USER" | "ADMIN";
-  is2FAEnabled: boolean;
   isActive: boolean;
   createdAt: string;
 }
@@ -39,8 +37,7 @@ function AdminDashboard() {
           setError("You do not have permission to access this page.");
         } else {
           setError(
-            err.response?.data?.message ||
-              "Unable to load users."
+            err.response?.data?.message || "Unable to load users."
           );
         }
       } finally {
@@ -70,13 +67,20 @@ function AdminDashboard() {
 
   return (
     <div className="admin-page">
+
+      {/* Navbar */}
       <nav className="admin-nav">
+
         <div className="dashboard-logo">
           Secure<span>Auth</span>
         </div>
 
         <div className="admin-nav-right">
-          <span className="admin-label">ADMIN PANEL</span>
+
+          <div className="admin-account">
+            <span className="admin-indicator"></span>
+            <span>Admin</span>
+          </div>
 
           <button
             className="logout-btn"
@@ -84,74 +88,119 @@ function AdminDashboard() {
           >
             Logout
           </button>
+
         </div>
       </nav>
 
+      {/* Main */}
       <main className="admin-content">
-        <div className="admin-header">
-          <div>
+
+        {/* Header */}
+        <section className="admin-header">
+
+          <div className="admin-title-section">
+
             <p className="dashboard-eyebrow">
               ADMINISTRATION
             </p>
 
-            <h1>User management</h1>
+            <h1>User Management</h1>
 
-            <p>
-              View registered users and their authentication status.
+            <p className="admin-subtitle">
+              Manage registered accounts and monitor account status.
             </p>
+
           </div>
 
-          <div className="admin-count">
+          {/* Total users */}
+          <div className="admin-count-card">
+
+            <span className="admin-count-label">
+              TOTAL USERS
+            </span>
+
             <strong>{users.length}</strong>
-            <span>Total users</span>
+
+            <span className="admin-count-description">
+              Registered accounts
+            </span>
+
           </div>
-        </div>
+
+        </section>
 
         {error ? (
+
           <div className="admin-error">
-            <div className="card-icon">🛡️</div>
-            <h3>Access denied</h3>
-            <p>{error}</p>
+
+            <div className="error-icon">
+              !
+            </div>
+
+            <div>
+              <h3>Access denied</h3>
+              <p>{error}</p>
+            </div>
 
             <button
               className="enable-2fa-btn"
               onClick={() => navigate("/dashboard")}
             >
-              ← Back to dashboard
+              Back to dashboard
             </button>
+
           </div>
+
         ) : (
-          <div className="admin-table-card">
+
+          <section className="admin-table-card">
+
+            {/* Table header */}
             <div className="admin-table-header">
+
               <div>
-                <h2>Registered users</h2>
+                <h2>Registered Users</h2>
+
                 <p>
-                  Authentication and account overview
+                  Overview of accounts registered on SecureAuth.
                 </p>
               </div>
+
+              <div className="user-count-small">
+                {users.length} {users.length === 1 ? "user" : "users"}
+              </div>
+
             </div>
 
+            {/* Table */}
             <div className="admin-table-wrapper">
+
               <table className="admin-table">
+
                 <thead>
                   <tr>
                     <th>Email</th>
-                    <th>Phone</th>
                     <th>Role</th>
-                    <th>2FA</th>
                     <th>Status</th>
                     <th>Joined</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>
-                        <strong>{user.email}</strong>
-                      </td>
 
-                      <td>{user.phone}</td>
+                  {users.map((user) => (
+
+                    <tr key={user.id}>
+
+                      <td>
+                        <div className="user-email">
+                          <div className="user-avatar">
+                            {user.email.charAt(0).toUpperCase()}
+                          </div>
+
+                          <strong>{user.email}</strong>
+                        </div>
+                      </td>
 
                       <td>
                         <span
@@ -166,18 +215,6 @@ function AdminDashboard() {
                       </td>
 
                       <td>
-                        {user.is2FAEnabled ? (
-                          <span className="table-status enabled">
-                            ✓ Enabled
-                          </span>
-                        ) : (
-                          <span className="table-status disabled">
-                            Not enabled
-                          </span>
-                        )}
-                      </td>
-
-                      <td>
                         <span
                           className={
                             user.isActive
@@ -185,24 +222,31 @@ function AdminDashboard() {
                               : "table-status disabled"
                           }
                         >
-                          {user.isActive
-                            ? "Active"
-                            : "Inactive"}
+                          <span className="status-mini-dot"></span>
+                          {user.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
 
-                      <td>
+                      <td className="joined-date">
                         {new Date(
                           user.createdAt
                         ).toLocaleDateString()}
                       </td>
+
                     </tr>
+
                   ))}
+
                 </tbody>
+
               </table>
+
             </div>
-          </div>
+
+          </section>
+
         )}
+
       </main>
     </div>
   );

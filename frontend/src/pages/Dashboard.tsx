@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -33,7 +32,6 @@ function Dashboard() {
       } catch (error) {
         console.error("Failed to fetch profile:", error);
 
-        // Token is invalid/expired
         await logout();
         navigate("/login");
       } finally {
@@ -76,117 +74,128 @@ function Dashboard() {
         </button>
       </nav>
 
-      {/* Main content */}
+      {/* Dashboard */}
       <main className="dashboard-content">
 
-        <div className="dashboard-welcome">
+        {/* Header */}
+        <section className="dashboard-header">
           <div>
             <p className="dashboard-eyebrow">
-              AUTHENTICATED DASHBOARD
+              ACCOUNT OVERVIEW
             </p>
 
-            <h1>
-              Welcome back 👋
-            </h1>
+            <h1>Your Dashboard</h1>
 
-            <p>
-              Your account is securely authenticated.
+            <p className="dashboard-subtitle">
+              Manage your account and security settings from one place.
             </p>
           </div>
 
-          <div className="security-status">
+          <div className="session-status">
             <span className="status-dot"></span>
-            Secure session
+            <span>Secure session</span>
           </div>
-        </div>
+        </section>
 
-        {/* Cards */}
-        <div className="dashboard-grid">
+        {/* Dashboard Cards */}
+        <section className="dashboard-grid">
 
-          {/* Account */}
-          <div className="dashboard-card">
-            <div className="card-icon">
-              👤
+          {/* Account Card */}
+          <div className="dashboard-card account-card">
+            <div className="card-header">
+              <div className="card-title">
+                <div className="card-icon">
+                  <span></span>
+                </div>
+
+                <div>
+                  <h3>Account</h3>
+                  <p>Your account information</p>
+                </div>
+              </div>
             </div>
-
-            <h3>
-              Account
-            </h3>
 
             <div className="profile-details">
 
-              <div>
-                <span>Email</span>
-                <strong>
-                  {user?.email}
-                </strong>
+              <div className="profile-item">
+                <span>Email address</span>
+                <strong>{user?.email}</strong>
               </div>
 
-              <div>
-                <span>Phone</span>
-                <strong>
-                  {user?.phone}
-                </strong>
+              <div className="profile-item">
+                <span>Phone number</span>
+                <strong>{user?.phone}</strong>
               </div>
 
-              <div>
-                <span>Role</span>
-                <strong>
-                  {user?.role}
-                </strong>
+              <div className="profile-item">
+                <span>Account role</span>
+                <strong>{user?.role}</strong>
               </div>
 
             </div>
           </div>
 
-          {/* 2FA */}
-          <div className="dashboard-card">
-            <div className="card-icon">
-              🔐
+          {/* 2FA Card */}
+          <div className="dashboard-card security-card">
+            <div className="card-header">
+              <div className="card-title">
+                <div className="card-icon shield-icon">
+                  <span></span>
+                </div>
+
+                <div>
+                  <h3>Two-factor authentication</h3>
+                  <p>Protect your account with an additional verification step.</p>
+                </div>
+              </div>
             </div>
 
-            <h3>
-              Two-factor authentication
-            </h3>
-
-            <p className="card-description">
-              Add an extra layer of security to your account.
-            </p>
-
-            {user?.is2FAEnabled ? (
-  <div className="security-badge">✓ Enabled</div>
-) : (
-  <button
-    type="button"
-    className="enable-2fa-btn"
-    onClick={() => navigate("/2fa")}
-  >
-    Enable 2FA →
-  </button>
-)}
-          </div>
-
-          {/* JWT */}
-          <div className="dashboard-card">
-            <div className="card-icon">
-              🛡️
-            </div>
-
-            <h3>
-              Authentication
-            </h3>
-
-            <p className="card-description">
-              Your session is protected using a JWT
-              access token.
-            </p>
-
-            <div className="security-badge">
-              ✓ Protected
+            <div className="card-bottom">
+              {user?.is2FAEnabled ? (
+                <div className="security-badge">
+                  <span className="badge-dot"></span>
+                  Enabled
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="enable-2fa-btn"
+                  onClick={() => navigate("/2fa")}
+                >
+                  Enable 2FA
+                  <span>→</span>
+                </button>
+              )}
             </div>
           </div>
 
-        </div>
+          {/* Authentication Card */}
+          <div className="dashboard-card authentication-card">
+            <div className="card-header">
+              <div className="card-title">
+                <div className="card-icon lock-icon">
+                  <span></span>
+                </div>
+
+                <div>
+                  <h3>Authentication</h3>
+                  <p>
+                    Your session is protected using secure JWT authentication.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-bottom">
+              <div className="security-badge">
+                <span className="badge-dot"></span>
+                Protected
+              </div>
+            </div>
+          </div>
+
+        </section>
+
       </main>
     </div>
   );

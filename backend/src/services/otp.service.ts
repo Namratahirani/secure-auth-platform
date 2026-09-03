@@ -8,20 +8,20 @@ export const generateAndSendOtp = async (
   phone: string,
   purpose: string
 ) => {
-  // Generate a random 6-digit OTP
+  //GENERATE RANDOM OTP
   const otp = crypto
     .randomInt(100000, 1000000)
     .toString();
 
-  // Hash OTP before storing it
+ 
   const codeHash = await bcrypt.hash(otp, 10);
 
-  // OTP expires after 5 minutes
+  
   const expiresAt = new Date(
     Date.now() + 5 * 60 * 1000
   );
 
-  // Store OTP in database
+  
   await prisma.oTP.create({
     data: {
       userId,
@@ -83,7 +83,7 @@ export const verifyOtp = async (
     throw new Error("Invalid OTP");
   }
 
-  // Mark OTP as used
+  
   await prisma.oTP.update({
     where: {
       id: otpRecord.id,
@@ -93,8 +93,7 @@ export const verifyOtp = async (
     },
   });
 
-  // Only enable 2FA when this OTP was specifically
-  // generated for enabling 2FA
+
   if (purpose === "ENABLE_2FA") {
     await prisma.user.update({
       where: {

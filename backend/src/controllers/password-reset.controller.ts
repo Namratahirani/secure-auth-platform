@@ -29,7 +29,7 @@ export const forgotPassword = async (
       userAgent: req.get("user-agent"),
     });
 
-    // Same response whether user exists or not
+    
     return res.status(200).json({
       message:
         "If an account exists with this email, a password reset link has been generated.",

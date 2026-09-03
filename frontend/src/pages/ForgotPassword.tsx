@@ -35,12 +35,9 @@ function ForgotPassword() {
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
-
         <div className="auth-brand">
           <div>
-            <div className="brand-badge">
-              🔑 Account recovery
-            </div>
+            <div className="brand-badge">Account recovery</div>
 
             <h1
               className="brand-heading"
@@ -54,24 +51,6 @@ function ForgotPassword() {
             <p className="brand-subtext">
               No worries. Enter your registered email and we'll
               help you securely reset your password.
-            </p>
-          </div>
-
-          <div className="progress-card">
-            <div className="progress-header">
-              <span>Account recovery</span>
-              <span style={{ color: "#818cf8" }}>50%</span>
-            </div>
-
-            <div className="progress-bar-bg">
-              <div
-                className="progress-bar-fill"
-                style={{ width: "50%" }}
-              />
-            </div>
-
-            <p className="progress-footer">
-              We'll guide you through the recovery process.
             </p>
           </div>
         </div>
@@ -123,12 +102,7 @@ function ForgotPassword() {
               Back to login
             </Link>
           </p>
-
-          <div className="auth-footer-meta">
-            Secure password recovery • Single-use token
-          </div>
         </div>
-
       </div>
     </div>
   );

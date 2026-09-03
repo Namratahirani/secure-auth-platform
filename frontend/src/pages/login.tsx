@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -10,6 +9,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,22 +22,15 @@ export default function Login() {
     try {
       const result = await login(email, password);
 
-      // If 2FA is enabled, go to OTP verification
       if (result.requires2FA) {
         navigate("/verify-2fa", {
           state: {
             twoFactorToken: result.twoFactorToken,
           },
         });
-      }
-
-      // Normal login
-      else if (result.role === "ADMIN") {
+      } else if (result.role === "ADMIN") {
         navigate("/admin");
-      }
-
-      // Normal USER login
-      else {
+      } else {
         navigate("/dashboard");
       }
     } catch (err: any) {
@@ -53,70 +46,36 @@ export default function Login() {
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
-
-        {/* Left Side: Product Branding */}
         <div className="auth-brand">
           <div>
-            <div className="brand-badge">
-              ✨ Learn smarter with Learnly
-            </div>
+            <div className="brand-badge">Welcome</div>
 
-            <h1
-              className="brand-heading"
-              style={{ marginTop: "16px" }}
-            >
-              Your goals. <br />
-              <span>Your journey.</span>
+            <h1 className="brand-heading">
+              Everything you need.
+              <br />
+              <span>In one place.</span>
             </h1>
 
             <p className="brand-subtext">
-              Build your learning streak, track your progress,
-              and keep improving every single day.
-            </p>
-          </div>
-
-          <div className="progress-card">
-            <div className="progress-header">
-              <span>Weekly progress</span>
-              <span style={{ color: "#818cf8" }}>
-                78%
-              </span>
-            </div>
-
-            <div className="progress-bar-bg">
-              <div className="progress-bar-fill" />
-            </div>
-
-            <p className="progress-footer">
-              Keep going! You're doing great 🚀
+              Manage your account, keep track of your learning,
+              and stay focused on what matters.
             </p>
           </div>
         </div>
 
-        {/* Right Side: Auth Form */}
         <div className="auth-card">
           <div className="auth-header">
-            <h2>Welcome back 👋</h2>
-
-            <p>
-              Sign in to access your dashboard and continue
-              learning.
-            </p>
+            <h2>Welcome back</h2>
+            <p>Sign in to continue where you left off.</p>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="auth-form"
-          >
+          <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label>Email address</label>
-
               <input
                 type="email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
               />
@@ -125,59 +84,57 @@ export default function Login() {
             <div className="form-group">
               <div className="form-label-row">
                 <label>Password</label>
-
-                <Link
-                  to="/forgot-password"
-                  className="auth-link"
-                >
+                <Link to="/forgot-password" className="auth-link">
                   Forgot password?
                 </Link>
               </div>
 
-              <input
-                type="password"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                placeholder="••••••••"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <span
+                    className={
+                      showPassword ? "eye-icon eye-hidden" : "eye-icon"
+                    }
+                  >
+                    <span className="eye-pupil"></span>
+                  </span>
+                </button>
+              </div>
             </div>
 
-            {error && (
-              <div className="form-error">
-                {error}
-              </div>
-            )}
+            {error && <div className="form-error">{error}</div>}
 
             <button
               type="submit"
               disabled={loading}
               className="submit-btn"
             >
-              {loading
-                ? "Signing in..."
-                : "Sign in"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
           <p className="switch-mode">
             Don't have an account?{" "}
-
-            <Link
-              to="/register"
-              className="auth-link"
-            >
+            <Link to="/register" className="auth-link">
               Create account
             </Link>
           </p>
-
-          <div className="auth-footer-meta">
-            Secure authentication • JWT • 2FA
-          </div>
         </div>
-
       </div>
     </div>
   );

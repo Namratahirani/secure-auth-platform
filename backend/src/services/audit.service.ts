@@ -23,7 +23,7 @@ export const createAuditLog = async ({
       },
     });
   } catch (error) {
-    // Audit logging should not break the authentication flow.
+    
     console.error("Failed to create audit log:", error);
   }
 };

@@ -11,6 +11,10 @@ function ResetPassword() {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -64,43 +68,18 @@ function ResetPassword() {
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
-
         <div className="auth-brand">
           <div>
-            <div className="brand-badge">
-              🔐 Secure password reset
-            </div>
+            <div className="brand-badge">Password recovery</div>
 
-            <h1
-              className="brand-heading"
-              style={{ marginTop: "16px" }}
-            >
+            <h1 className="brand-heading" style={{ marginTop: "16px" }}>
               Create a new
               <br />
               <span>password.</span>
             </h1>
 
             <p className="brand-subtext">
-              Choose a strong password to keep your account
-              protected.
-            </p>
-          </div>
-
-          <div className="progress-card">
-            <div className="progress-header">
-              <span>Account recovery</span>
-              <span style={{ color: "#818cf8" }}>100%</span>
-            </div>
-
-            <div className="progress-bar-bg">
-              <div
-                className="progress-bar-fill"
-                style={{ width: "100%" }}
-              />
-            </div>
-
-            <p className="progress-footer">
-              Almost done. Set your new password.
+              Choose a strong password to keep your account protected.
             </p>
           </div>
         </div>
@@ -108,52 +87,84 @@ function ResetPassword() {
         <div className="auth-card">
           <div className="auth-header">
             <h2>Set new password</h2>
-            <p>
-              Enter your new password below.
-            </p>
+            <p>Enter your new password below.</p>
           </div>
 
           {error && <div className="form-error">{error}</div>}
 
-          {message && (
-            <div className="form-success">
-              {message}
-            </div>
-          )}
+          {message && <div className="form-success">{message}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form">
+            {/* New Password */}
             <div className="form-group">
-              <label htmlFor="password">
-                New password
-              </label>
+              <label htmlFor="password">New password</label>
 
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
-                placeholder="Create a strong password"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a strong password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <span
+                    className={
+                      showPassword ? "eye-icon eye-hidden" : "eye-icon"
+                    }
+                  >
+                    <span className="eye-pupil"></span>
+                  </span>
+                </button>
+              </div>
             </div>
 
+            {/* Confirm Password */}
             <div className="form-group">
-              <label htmlFor="confirmPassword">
-                Confirm password
-              </label>
+              <label htmlFor="confirmPassword">Confirm password</label>
 
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(e.target.value)
-                }
-                placeholder="Enter password again"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Enter password again"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                >
+                  <span
+                    className={
+                      showConfirmPassword
+                        ? "eye-icon eye-hidden"
+                        : "eye-icon"
+                    }
+                  >
+                    <span className="eye-pupil"></span>
+                  </span>
+                </button>
+              </div>
             </div>
 
             <button
@@ -161,9 +172,7 @@ function ResetPassword() {
               disabled={loading}
               className="submit-btn"
             >
-              {loading
-                ? "Resetting password..."
-                : "Reset password"}
+              {loading ? "Resetting password..." : "Reset password"}
             </button>
           </form>
 
@@ -173,12 +182,7 @@ function ResetPassword() {
               Back to login
             </Link>
           </p>
-
-          <div className="auth-footer-meta">
-            Single-use token • Secure password recovery
-          </div>
         </div>
-
       </div>
     </div>
   );

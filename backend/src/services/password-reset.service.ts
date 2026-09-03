@@ -7,7 +7,7 @@ export const createPasswordResetToken = async (email: string) => {
     where: { email },
   });
 
-  // Don't reveal whether an email exists
+  
   if (!user) {
     return;
   }
@@ -22,7 +22,7 @@ const tokenHash = crypto
 
 const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-// Invalidate any previous unused password reset tokens
+
 await prisma.passwordReset.updateMany({
   where: {
     userId: user.id,
@@ -42,7 +42,7 @@ await prisma.passwordReset.create({
   },
 });
 
-  // For development, we'll log the reset link.
+
   const resetLink =
     `http://localhost:5173/reset-password?token=${resetToken}`;
 
@@ -94,7 +94,7 @@ await prisma.user.update({
   },
 });
 
-// Revoke all existing refresh tokens after password reset
+
 await prisma.refreshToken.updateMany({
   where: {
     userId: resetRecord.userId,
@@ -105,7 +105,7 @@ await prisma.refreshToken.updateMany({
   },
 });
 
-// Make the token single-use
+
 await prisma.passwordReset.update({
     where: {
       id: resetRecord.id,

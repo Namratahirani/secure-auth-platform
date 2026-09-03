@@ -26,27 +26,26 @@ export const verifyLogin2FA = async (
   try {
     const { twoFactorToken, otp } = req.body;
 
-    // Check required fields
     if (!twoFactorToken || !otp) {
       return res.status(400).json({
         message: "Two-factor token and OTP are required",
       });
     }
 
-    // Check OTP format
+   
     if (!/^\d{6}$/.test(otp)) {
       return res.status(400).json({
         message: "OTP must be a 6-digit number",
       });
     }
 
-    // Verify the temporary 2FA token
+    
     const decoded = jwt.verify(
       twoFactorToken,
       JWT_2FA_SECRET
     );
 
-    // Make sure it is actually a 2FA login token
+    
     if (
       typeof decoded !== "object" ||
       !decoded ||
@@ -59,28 +58,27 @@ export const verifyLogin2FA = async (
 
     const userId = decoded.userId as string;
 
-    // Verify OTP
+   
     await verifyOtp(
       userId,
       otp,
       "LOGIN_2FA"
     );
 
-    // Fetch the user from the database
+   
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
 
-    // Make sure the user still exists and is active
+   
     if (!user || !user.isActive) {
       return res.status(401).json({
         message: "User account is inactive or does not exist",
       });
     }
 
-    // OTP is correct → issue real tokens
     const accessToken = generateAccessToken({
       userId: user.id,
       role: user.role,
@@ -112,7 +110,7 @@ export const verifyLogin2FA = async (
 
   } catch (error) {
 
-    // Handle known OTP errors
+  
     if (error instanceof Error) {
       if (
         error.message === "Invalid OTP" ||
@@ -126,7 +124,7 @@ export const verifyLogin2FA = async (
       }
     }
 
-    // Invalid/expired JWT or unexpected error
+    
     return res.status(401).json({
       message: "Invalid or expired 2FA token",
     });

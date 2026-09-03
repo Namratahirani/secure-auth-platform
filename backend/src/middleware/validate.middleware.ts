@@ -28,8 +28,7 @@ export const validate = (schema: ZodSchema) => {
       });
     }
 
-    // Zod 4's generic type can be unknown,
-    // so safely extract the validated body.
+    
     const validatedData = result.data as {
       body: unknown;
     };

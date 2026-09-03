@@ -7,10 +7,8 @@ export const getAllUsers = async (req: Request, res: Response) => {
       select: {
         id: true,
         email: true,
-        phone: true,
         role: true,
         isActive: true,
-        is2FAEnabled: true,
         createdAt: true,
       },
       orderBy: {

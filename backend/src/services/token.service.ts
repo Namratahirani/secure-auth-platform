@@ -18,11 +18,7 @@ interface AccessTokenPayload {
   role: string;
 }
 
-/**
- * Generates a short-lived JWT access token.
- * Access tokens are intentionally short-lived to reduce
- * the impact of token theft.
- */
+
 export const generateAccessToken = (
   payload: AccessTokenPayload
 ) => {
@@ -31,10 +27,7 @@ export const generateAccessToken = (
   });
 };
 
-/**
- * Generates a cryptographically secure refresh token.
- * Only the SHA-256 hash is stored in the database.
- */
+
 export const generateRefreshToken = async (
   userId: string
 ) => {
@@ -59,12 +52,7 @@ export const generateRefreshToken = async (
   return refreshToken;
 };
 
-/**
- * Validates a refresh token and rotates it.
- *
- * The existing refresh token is revoked and a new
- * access + refresh token pair is generated.
- */
+
 export const refreshAccessToken = async (
   refreshToken: string
 ) => {
@@ -98,7 +86,6 @@ export const refreshAccessToken = async (
     throw new Error("User account is inactive");
   }
 
-  // Revoke the old refresh token.
   await prisma.refreshToken.update({
     where: {
       id: storedToken.id,
@@ -125,9 +112,7 @@ export const refreshAccessToken = async (
   };
 };
 
-/**
- * Revokes a refresh token during logout.
- */
+
 export const revokeRefreshToken = async (
   refreshToken: string
 ) => {
@@ -160,10 +145,7 @@ export const revokeRefreshToken = async (
   });
 };
 
-/**
- * Generates a short-lived temporary token used
- * only during the 2FA login flow.
- */
+
 export const generateTwoFactorToken = (
   userId: string
 ) => {

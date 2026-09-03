@@ -1,18 +1,24 @@
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({
+  path: path.resolve(process.cwd(), "../.env"),
+});
+
 import express from "express";
+import cors from "cors";
+
 import authRoutes from "./routes/auth.routes.js";
 import twofaRoutes from "./routes/twofa.routes.js";
 import twofaLoginRoutes from "./routes/twofa-login.routes.js";
 import passwordResetRoutes from "./routes/password-reset.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import cors from "cors";
-
-
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
   })
 );
 
