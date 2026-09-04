@@ -62,6 +62,7 @@ The implementation provides:
 * Docker
 * Docker Compose
 * Git
+* Render
 
 ## Local Setup
 
@@ -94,9 +95,12 @@ DATABASE_URL
 JWT_SECRET
 JWT_REFRESH_SECRET
 PORT
+DEV_ENDPOINT_KEY
 ```
 
 Secrets must not be committed to Git.
+
+For the deployed application, environment variables are configured securely in the Render backend service.
 
 ### 3. Start PostgreSQL
 
@@ -294,7 +298,32 @@ The Developer Tools page is available from the login interface.
 
 It provides a development and demonstration interface for exercising supported authentication functionality.
 
-The feature is intended for development and evaluation purposes.
+### Developer Endpoint Key
+
+The Developer Tools endpoints are protected using a development authentication key.
+
+The key is configured through the `DEV_ENDPOINT_KEY` environment variable.
+
+For the deployed Render application, the key is configured securely in the Render backend environment variables.
+
+For evaluation, the Developer Endpoint Key is:
+
+```text
+DEV_ENDPOINT_SECRET="859ef8c84215a75e180f2ce6b6c814ce53b2129d18fa499e538b71cf41f585a5"
+
+```
+
+This key is intentionally provided for evaluation of the Developer Tools functionality.
+
+The key is not stored in the GitHub repository's source code or `.env` files.
+
+For local development, configure the same variable in the local `.env` file:
+
+```text
+DEV_ENDPOINT_KEY=YOUR_DEV_ENDPOINT_KEY
+```
+
+The Developer Tools feature is intended for development and evaluation purposes.
 
 ## Security Implementation
 
@@ -383,6 +412,8 @@ docker compose down -v
 
 The final command removes Docker volumes and should only be used when intentionally resetting the development database.
 
+The Docker Compose setup was successfully used to start PostgreSQL and the backend application.
+
 ## Critical Thinking Proof
 
 The required proof files are stored under:
@@ -415,12 +446,12 @@ The SHA-256 digest is signed using an ECDSA secp256r1 private key.
 The public key is included as:
 
 ```text
-proof_pub.pem
+PROOF_OF_SUBMISSION/proof_pub.pem
 ```
 
-The private key is not included in the repository.
+The private key is intentionally excluded from the repository and is listed in `.gitignore`.
 
-The proof was regenerated after the final repository changes and verified successfully using the corresponding public key.
+The proof was regenerated after the final repository changes and independently verified successfully using the corresponding public key.
 
 ## Proof Commands
 
@@ -443,13 +474,7 @@ The proof-generation script:
 The final repository commit used for the proof is:
 
 ```text
-f45b43f30e1bcfd8555f005bc80f959164563336
-```
-
-The commit was created with:
-
-```text
-Update submission proof
+bcc6bd1cd04406cb546f535fdcc5a7bce61fa238
 ```
 
 The challenge used was:
@@ -458,13 +483,7 @@ The challenge used was:
 529236dc72ecbe08bd5994a34c87fdca1fe65046ad4f334ae99e726831e49a87
 ```
 
-The SHA-256 digest used during verification was:
-
-```text
-96379c628f2aa6309a21e7c7e53062adc86843d7011605caeb219f54824b69ee
-```
-
-The generated signature is stored in:
+The proof signature generated from the final commit is stored in:
 
 ```text
 PROOF_OF_SUBMISSION/proof.txt
@@ -475,6 +494,8 @@ The corresponding public key is stored in:
 ```text
 PROOF_OF_SUBMISSION/proof_pub.pem
 ```
+
+The private signing key is not included in the repository.
 
 ## Proof Verification
 
@@ -495,7 +516,7 @@ The verification process checks that:
 5. The resulting digest is verified using the ECDSA public key.
 6. The signature in `proof.txt` is valid for that digest.
 
-The final proof files currently tracked by Git are:
+The final proof files tracked by Git are:
 
 ```text
 PROOF_OF_SUBMISSION/challenge.txt
@@ -508,7 +529,7 @@ PROOF_OF_SUBMISSION/proof_pub.pem
 
 The required demonstration video will be no longer than six minutes.
 
-The video will demonstrate:
+The video demonstrates:
 
 1. Registration
 2. Enabling 2FA
@@ -527,7 +548,7 @@ The video will demonstrate:
 Video link:
 
 ```text
-To be added before final submission.
+https://drive.google.com/drive/folders/1_cL21Wy0JAQco5dDF0JRJ1bOKTsv2wbe?usp=sharing
 ```
 
 ## Repository
@@ -535,8 +556,18 @@ To be added before final submission.
 GitHub repository:
 
 ```text
-To be added before final submission.
+https://github.com/Namratahirani/secure-auth-platform
 ```
+
+## Deployed Application
+
+Render deployment:
+
+```text
+https://secure-auth-platform.onrender.com
+```
+
+The deployed backend uses environment variables configured through Render rather than committing secrets to the repository.
 
 ## Final Submission Verification
 
@@ -555,10 +586,10 @@ The expected working-tree state is:
 nothing to commit, working tree clean
 ```
 
-The final commit currently used for the submission is:
+The final commit used for the cryptographic proof is:
 
 ```text
-f45b43f30e1bcfd8555f005bc80f959164563336
+bcc6bd1cd04406cb546f535fdcc5a7bce61fa238
 ```
 
 The repository contains the required proof files:
@@ -570,7 +601,7 @@ PROOF_OF_SUBMISSION/proof.txt
 PROOF_OF_SUBMISSION/proof_pub.pem
 ```
 
-The final repository should also contain:
+The final repository also contains:
 
 ```text
 README.md
@@ -583,4 +614,13 @@ PROOF_OF_SUBMISSION/proof.txt
 PROOF_OF_SUBMISSION/proof_pub.pem
 ```
 
-Before final submission, add the final GitHub repository URL and demonstration video URL to this document.
+Before final submission, ensure that the following placeholders have been replaced:
+
+```text
+PASTE_DEV_ENDPOINT_KEY_HERE
+PASTE_VIDEO_LINK_HERE
+PASTE_GITHUB_REPOSITORY_URL_HERE
+PASTE_RENDER_URL_HERE
+```
+
+After completing these updates, commit the documentation changes and regenerate the cryptographic proof if the documentation commit becomes the final submission commit.
