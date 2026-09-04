@@ -131,7 +131,7 @@ Docker is recommended because it provides a reproducible PostgreSQL environment.
 ### Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone <[repository-url](https://github.com/Namratahirani/secure-auth-platform)>
 cd secure-auth-platform
 ```
 
