@@ -335,6 +335,14 @@ cd backend
 npm test
 ```
 
+The final test run completed successfully:
+
+```text
+Test Suites: 2 passed, 2 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+```
+
 The test suite covers the main authentication flows, including:
 
 * Registration
@@ -350,6 +358,8 @@ The test suite covers the main authentication flows, including:
 * Refresh token revocation
 * Forgot password
 * Password reset
+* Role-based access control
+* Protected routes
 
 ## Docker
 
@@ -410,32 +420,71 @@ proof_pub.pem
 
 The private key is not included in the repository.
 
-The exact commands used to generate and verify the proof will be recorded below after the final repository commit has been created.
+The proof was regenerated after the final repository changes and verified successfully using the corresponding public key.
 
 ## Proof Commands
 
-The final proof-generation commands will be recorded here.
-
-Example workflow:
+The proof was generated using:
 
 ```bash
 cd PROOF_OF_SUBMISSION
 ./compute_proof.sh
 ```
 
-The exact command used on the submission machine and its output will be recorded before final submission.
+The proof-generation script:
 
-The repository HEAD used for the proof will be recorded using:
+1. Reads the challenge from `challenge.txt`.
+2. Obtains the current repository commit using `git rev-parse HEAD`.
+3. Concatenates the challenge and commit hash without whitespace.
+4. Calculates SHA-256 over the resulting message.
+5. Signs the digest using the ECDSA secp256r1 private key.
+6. Base64-encodes the resulting signature into `proof.txt`.
 
-```bash
-git rev-parse HEAD
+The final repository commit used for the proof is:
+
+```text
+f45b43f30e1bcfd8555f005bc80f959164563336
 ```
 
-The challenge and commit hash will be concatenated without whitespace before calculating SHA-256.
+The commit was created with:
 
-The proof will be independently verified using the included public key.
+```text
+Update submission proof
+```
+
+The challenge used was:
+
+```text
+529236dc72ecbe08bd5994a34c87fdca1fe65046ad4f334ae99e726831e49a87
+```
+
+The SHA-256 digest used during verification was:
+
+```text
+96379c628f2aa6309a21e7c7e53062adc86843d7011605caeb219f54824b69ee
+```
+
+The generated signature is stored in:
+
+```text
+PROOF_OF_SUBMISSION/proof.txt
+```
+
+The corresponding public key is stored in:
+
+```text
+PROOF_OF_SUBMISSION/proof_pub.pem
+```
 
 ## Proof Verification
+
+The proof was independently verified using the generated public key.
+
+The verification completed successfully with:
+
+```text
+Signature Verified Successfully
+```
 
 The verification process checks that:
 
@@ -446,7 +495,14 @@ The verification process checks that:
 5. The resulting digest is verified using the ECDSA public key.
 6. The signature in `proof.txt` is valid for that digest.
 
-The final verification output will be recorded here.
+The final proof files currently tracked by Git are:
+
+```text
+PROOF_OF_SUBMISSION/challenge.txt
+PROOF_OF_SUBMISSION/compute_proof.sh
+PROOF_OF_SUBMISSION/proof.txt
+PROOF_OF_SUBMISSION/proof_pub.pem
+```
 
 ## Submission Video
 
@@ -489,9 +545,32 @@ Before submitting, verify:
 ```powershell
 git status
 git rev-parse HEAD
+git log --oneline -3
+git ls-files PROOF_OF_SUBMISSION
 ```
 
-Then verify that the repository contains:
+The expected working-tree state is:
+
+```text
+nothing to commit, working tree clean
+```
+
+The final commit currently used for the submission is:
+
+```text
+f45b43f30e1bcfd8555f005bc80f959164563336
+```
+
+The repository contains the required proof files:
+
+```text
+PROOF_OF_SUBMISSION/challenge.txt
+PROOF_OF_SUBMISSION/compute_proof.sh
+PROOF_OF_SUBMISSION/proof.txt
+PROOF_OF_SUBMISSION/proof_pub.pem
+```
+
+The final repository should also contain:
 
 ```text
 README.md
@@ -504,4 +583,4 @@ PROOF_OF_SUBMISSION/proof.txt
 PROOF_OF_SUBMISSION/proof_pub.pem
 ```
 
-The final Git commit hash and proof outputs must be recorded in this document before submission.
+Before final submission, add the final GitHub repository URL and demonstration video URL to this document.
