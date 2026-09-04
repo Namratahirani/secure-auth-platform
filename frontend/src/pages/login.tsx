@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../App.css";
 
+
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -140,6 +141,11 @@ if (result.requiresTOTP) {
               Create account
             </Link>
           </p>
+          <div className="developer-tools-link">
+  <Link to="/developer-tools">
+    Developer Tools
+  </Link>
+</div>
         </div>
       </div>
     </div>

@@ -2033,3 +2033,18 @@ body {
   }
 }
 
+.developer-tools-link {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.developer-tools-link a {
+  color: #666666;
+  font-size: 11px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.developer-tools-link a:hover {
+  color: var(--yellow);
+}

@@ -11,6 +11,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./pages/AdminDashboard";
 import DeveloperTools from "./pages/DeveloperTools";
 
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import VerifyTOTP from "./pages/VerifyTOTP";
 
@@ -28,6 +29,7 @@ function App() {
         path="/login"
         element={<Login />}
       />
+      
 
       <Route
   path="/developer-tools"
