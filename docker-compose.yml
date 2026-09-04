@@ -25,10 +25,11 @@ services:
     ports:
       - "5000:5000"
     environment:
-  DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-  JWT_2FA_SECRET: ${JWT_2FA_SECRET}
-  ENABLE_DEV_ENDPOINTS: ${ENABLE_DEV_ENDPOINTS}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_2FA_SECRET: ${JWT_2FA_SECRET}
+      ENABLE_DEV_ENDPOINTS: ${ENABLE_DEV_ENDPOINTS}
+      DEV_ENDPOINT_SECRET: ${DEV_ENDPOINT_SECRET}
     depends_on:
       postgres:
         condition: service_healthy

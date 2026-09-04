@@ -3,6 +3,7 @@ import path from "path";
 import devRoutes from "./routes/dev.routes.js";
 import totpRoutes from "./routes/totp.routes.js";
 import totpLoginRoutes from "./routes/totp-login.routes.js";
+import { devAuthMiddleware } from "./middleware/dev-auth.middleware.js";
 
 dotenv.config({
   path: path.resolve(process.cwd(), "../.env"),
@@ -22,7 +23,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: process.env.FRONTEND_URL,
   })
 );
 
@@ -44,7 +45,7 @@ app.use("/api/auth/totp", totpRoutes);
 app.use("/api/auth/totp-login", totpLoginRoutes);
 
 if (process.env.ENABLE_DEV_ENDPOINTS === "true") {
-  app.use("/api/dev", devRoutes);
+  app.use("/api/dev", devAuthMiddleware, devRoutes);
 }
 
 export default app;
