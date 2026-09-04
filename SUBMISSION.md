@@ -1,59 +1,147 @@
-# SecureAuth Platform
+# SecureAuth Platform Submission
 
 ## Overview
 
-SecureAuth is a secure authentication platform built with Node.js, Express, TypeScript, Prisma, and PostgreSQL.
+SecureAuth is a full-stack authentication platform built with Node.js, Express, TypeScript, Prisma, PostgreSQL, React, TypeScript, and Vite.
 
-The project implements user registration and login, JWT-based authentication, refresh-token rotation, phone OTP-based two-factor authentication, forgot-password and password-reset flows, rate limiting, request validation, and an admin user dashboard.
+The implementation provides:
+
+* User registration
+* JWT authentication
+* Short-lived access tokens
+* Refresh tokens
+* Refresh-token rotation
+* Refresh-token revocation
+* Refresh-token reuse detection
+* Password hashing with bcrypt
+* Phone-based OTP 2FA
+* TOTP-based 2FA support
+* OTP expiration and attempt limits
+* OTP rate limiting
+* Forgot-password flow
+* Secure password-reset tokens
+* Password-reset token expiration and single-use enforcement
+* Role-based access control
+* Protected API endpoints
+* Request validation
+* Authentication rate limiting
+* PostgreSQL persistence
+* Prisma ORM
+* Mock SMS OTP delivery
+* Admin dashboard
+* Developer Tools
+* Automated tests
+* Docker Compose support
+* Cryptographic proof of submission
 
 ## Technology Stack
 
-Backend: Node.js, Express, TypeScript
+### Backend
 
-Database: PostgreSQL
+* Node.js
+* Express
+* TypeScript
+* PostgreSQL
+* Prisma
+* bcrypt
+* JSON Web Tokens
+* Zod
+* Jest
+* Supertest
 
-ORM: Prisma
+### Frontend
 
-Authentication: JWT
+* React
+* TypeScript
+* Vite
+* React Router
 
-Password hashing: bcrypt
+### Infrastructure
 
-Testing: Jest and Supertest
+* PostgreSQL
+* Docker
+* Docker Compose
+* Git
 
-Frontend: React, TypeScript, Vite
+## Local Setup
 
-Containerization: Docker and Docker Compose
+### 1. Install dependencies
 
-## Running the Project
+From the repository root:
 
-Clone the repository and navigate to the project directory.
-
-Install backend dependencies:
-
-```bash
+```powershell
 cd backend
 npm install
 ```
 
-Install frontend dependencies:
+Then:
 
-```bash
-cd ../frontend
+```powershell
+cd ..\frontend
 npm install
 ```
 
-Create the required environment configuration using the provided `.env.example` file.
+### 2. Configure environment variables
 
-Start the complete application with Docker Compose:
+Create the required environment configuration based on the project's environment example files.
 
-```bash
+The backend requires the PostgreSQL connection string and authentication secrets.
+
+Typical variables include:
+
+```text
+DATABASE_URL
+JWT_SECRET
+JWT_REFRESH_SECRET
+PORT
+```
+
+Secrets must not be committed to Git.
+
+### 3. Start PostgreSQL
+
+Using Docker Compose:
+
+```powershell
 docker compose up --build
 ```
 
-The backend runs on:
+Alternatively, PostgreSQL can be installed and started locally, with `DATABASE_URL` configured accordingly.
+
+### 4. Apply database migrations
+
+From the backend directory:
+
+```powershell
+cd backend
+npx prisma migrate deploy
+```
+
+### 5. Load seed data
+
+```powershell
+npx prisma db seed
+```
+
+### 6. Start the backend
+
+```powershell
+npm run dev
+```
+
+The backend normally runs on:
 
 ```text
 http://localhost:5000
+```
+
+### 7. Start the frontend
+
+Open another terminal:
+
+```powershell
+cd frontend
+npm run dev
 ```
 
 The frontend normally runs on:
@@ -62,190 +150,238 @@ The frontend normally runs on:
 http://localhost:5173
 ```
 
-If Vite selects another available port, use the port shown in the terminal.
+If Vite selects another port, use the URL displayed by Vite.
 
 ## Database
 
-PostgreSQL runs through Docker Compose.
+PostgreSQL is the primary datastore.
 
-Prisma migrations are included in:
+Prisma migrations are located at:
 
 ```text
 backend/prisma/migrations
 ```
 
-The seed script creates demo user and administrator accounts.
+The seed script is:
 
-To run the seed:
-
-```bash
-cd backend
-npx prisma db seed
+```text
+backend/prisma/seed.ts
 ```
+
+The application persists authentication information in PostgreSQL, including user accounts, authentication state, refresh-token records, OTP records, and password-reset information.
 
 ## Evaluator Credentials
 
-Demo user:
-
-```text
-Email: demo@secureauth.com
-Password: TestPassword123!
-```
-
-Administrator:
+### Administrator
 
 ```text
 Email: admin@secureauth.com
 Password: AdminPassword123!
 ```
 
-The OTP used during 2FA testing is printed by the mock SMS adapter in the backend/Docker logs.
+### Demo User
 
-## Main Authentication Flows
+```text
+Email: demo@secureauth.com
+Password: TestPassword123!
+```
 
-### Registration
+These credentials are intended for evaluation and demonstration.
 
-Users can create an account with their email, password, and phone number.
+## Mock SMS OTP
 
-Passwords are hashed with bcrypt before being stored in the database.
+The project uses a mock SMS adapter for local testing.
+
+When an OTP is generated, the OTP is logged by the backend.
+
+During the demonstration, the OTP can therefore be obtained from the backend terminal or Docker logs.
+
+The OTP is not stored as plaintext in the database.
+
+The OTP is hashed before persistence and is subject to expiration, single-use enforcement, attempt limits, and rate limiting.
+
+## Authentication Endpoints
+
+### Register
+
+```text
+POST /api/auth/register
+```
+
+Request:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123!",
+  "phone": "+919876543210"
+}
+```
 
 ### Login
 
-Successful authentication generates a short-lived JWT access token and a long-lived refresh token.
+```text
+POST /api/auth/login
+```
 
-Access tokens expire after 15 minutes.
+The response determines whether additional 2FA verification is required.
 
-Refresh tokens are stored server-side as SHA-256 hashes and can be revoked.
+### Enable 2FA
 
-### Two-Factor Authentication
+```text
+POST /api/auth/2fa/enable
+```
 
-Users can enable phone-based two-factor authentication.
+Requires an authenticated user.
 
-The system generates a six-digit OTP and stores only its bcrypt hash.
+### Verify 2FA
 
-OTP codes expire after 5 minutes, are single-use, and have an attempt limit.
+```text
+POST /api/auth/2fa/verify
+```
 
-For this assignment, SMS delivery is implemented using a mock SMS adapter that logs the OTP to the backend console.
+Used to verify the generated OTP during the 2FA flow.
 
-### Refresh Tokens
+### Refresh Token
 
-Refresh tokens are stored server-side in hashed form.
+```text
+POST /api/auth/token/refresh
+```
 
-When a refresh token is used successfully, it is revoked and replaced with a new refresh token.
+Used to obtain a new access token using a valid refresh token.
+
+### Logout
+
+```text
+POST /api/auth/logout
+```
+
+Invalidates the refresh-token session.
 
 ### Forgot Password
 
-Password reset tokens are generated using cryptographically secure random bytes.
+```text
+POST /api/auth/forgot-password
+```
 
-Only the SHA-256 hash of the token is stored in the database.
+Generates a secure password-reset token.
 
-Reset tokens expire after one hour and can only be used once.
+### Reset Password
 
-Existing refresh sessions are revoked after a successful password reset.
+```text
+POST /api/auth/reset-password
+```
 
-## Security Controls
+Consumes a valid reset token and sets a new password.
 
-The project includes:
+### Protected Profile
 
-* Password hashing with bcrypt
+```text
+GET /api/profile
+```
+
+Requires a valid access token.
+
+## Developer Tools
+
+The frontend includes:
+
+```text
+/developer-tools
+```
+
+The Developer Tools page is available from the login interface.
+
+It provides a development and demonstration interface for exercising supported authentication functionality.
+
+The feature is intended for development and evaluation purposes.
+
+## Security Implementation
+
+The implementation includes:
+
+* bcrypt password hashing
 * Short-lived JWT access tokens
-* Hashed and revocable refresh tokens
+* Hashed refresh tokens
+* Server-side refresh-token persistence
 * Refresh-token rotation
-* Hashed OTP codes
-* OTP expiration and attempt limits
+* Refresh-token revocation
+* Refresh-token reuse detection
+* Hashed OTP values
+* OTP expiration
+* OTP single-use enforcement
+* OTP attempt limits
 * OTP rate limiting
-* Cryptographically random password-reset tokens
-* Password-reset token hashing
-* Single-use password-reset tokens
 * Login rate limiting
 * Forgot-password rate limiting
+* Cryptographically secure reset tokens
+* Hashed reset tokens
+* Single-use reset tokens
+* Reset-token expiration
 * Request validation
-* Prisma ORM for database access
-* Protected API endpoints
-* Active-user checks for protected authentication flows
-
-### Bonus Security Features
-
-- Refresh token rotation
-- Refresh token reuse detection
-- Automatic revocation of token chains after reuse attempts
-- Audit logging of authentication events
+* Prisma ORM
+* Protected routes
+* Role-based access control
+* Active-user checks
 
 ## Automated Tests
 
-The backend contains automated tests covering the main authentication flows, including registration, login, two-factor authentication, token refresh, forgot-password, and password-reset functionality.
+Tests are implemented using Jest and Supertest.
 
-Run the tests with:
+Run:
 
-```bash
+```powershell
 cd backend
 npm test
 ```
 
+The test suite covers the main authentication flows, including:
+
+* Registration
+* Login
+* Login with 2FA disabled
+* Login with 2FA enabled
+* OTP generation
+* OTP verification
+* Expired OTP
+* Reused OTP
+* Refresh token
+* Refresh token rotation
+* Refresh token revocation
+* Forgot password
+* Password reset
+
 ## Docker
 
-The project includes Docker Compose configuration for running the PostgreSQL database and backend service.
+Start the application and database:
 
-The application can therefore be started without manually configuring a local PostgreSQL installation.
-
-## Proof of Submission
-
-The `PROOF_OF_SUBMISSION` directory contains the cryptographic proof files required by the assignment.
-
-The proof is generated using:
-
-* A locally generated 32-byte random challenge
-* The Git commit hash obtained using `git rev-parse HEAD`
-* SHA-256 of the exact concatenation of `challenge + commit_hash`
-* An ECDSA key pair using the `secp256r1` / `prime256v1` curve
-* A base64-encoded ECDSA signature
-
-### Proof generation script
-
-The proof was generated using:
-
-```bash
-./compute_proof.sh
+```powershell
+docker compose up --build
 ```
 
-The script reads `challenge.txt`, obtains the repository commit hash, computes:
+Stop the services:
+
+```powershell
+docker compose down
+```
+
+Reset the local Docker database:
+
+```powershell
+docker compose down -v
+```
+
+The final command removes Docker volumes and should only be used when intentionally resetting the development database.
+
+## Critical Thinking Proof
+
+The required proof files are stored under:
 
 ```text
-SHA256(challenge + commit_hash)
+PROOF_OF_SUBMISSION/
 ```
 
-and signs the resulting digest using the locally generated ECDSA private key.
-
-The private key is intentionally excluded from Git using `.gitignore`.
-
-### Proof verification
-
-The proof was independently verified using the public key with:
-
-```bash
-CHALLENGE="$(tr -d '\r\n' < challenge.txt)"
-COMMIT_HASH="$(git -C .. rev-parse HEAD)"
-
-printf '%s' "${CHALLENGE}${COMMIT_HASH}" | openssl dgst -sha256 -binary > verify_digest.bin
-
-base64 -d proof.txt > verify_signature.der
-
-openssl pkeyutl \
-  -verify \
-  -rawin \
-  -pubin \
-  -inkey proof_pub.pem \
-  -in verify_digest.bin \
-  -sigfile verify_signature.der
-```
-
-Verification result:
-
-```text
-Signature Verified Successfully
-```
-
-The proof files included in `PROOF_OF_SUBMISSION` are:
+Required files:
 
 ```text
 challenge.txt
@@ -254,57 +390,118 @@ proof.txt
 proof_pub.pem
 ```
 
-The private signing key is not included in the submission.
-
-### Proof generation evidence
-
-The proof was generated against the repository HEAD commit at the time of proof generation:
+The proof process is:
 
 ```text
-Commit hash: f154d79ec298cb33f4008dbfdc32eede07eee72f
+challenge
++
+latest Git commit hash
+=
+SHA-256 digest
 ```
 
-The SHA-256 digest of the concatenated challenge and commit hash was:
+The SHA-256 digest is signed using an ECDSA secp256r1 private key.
+
+The public key is included as:
 
 ```text
-f4c552688baf0ff0d5c74e36389e03f7f75dfc2308d9c6f3fc75c5ff33498ca6
+proof_pub.pem
 ```
 
-To independently reproduce the digest calculation:
+The private key is not included in the repository.
+
+The exact commands used to generate and verify the proof will be recorded below after the final repository commit has been created.
+
+## Proof Commands
+
+The final proof-generation commands will be recorded here.
+
+Example workflow:
 
 ```bash
-CHALLENGE="$(tr -d '\r\n' < challenge.txt)"
-COMMIT_HASH="$(git -C .. rev-parse HEAD)"
-
-printf '%s' "${CHALLENGE}${COMMIT_HASH}" | sha256sum
+cd PROOF_OF_SUBMISSION
+./compute_proof.sh
 ```
 
-The resulting SHA-256 digest should match the digest recorded above.
+The exact command used on the submission machine and its output will be recorded before final submission.
 
-The proof signature was successfully verified against `proof_pub.pem` using OpenSSL ECDSA verification.
+The repository HEAD used for the proof will be recorded using:
 
-## Demo Video
+```bash
+git rev-parse HEAD
+```
 
-The final demonstration video will cover:
+The challenge and commit hash will be concatenated without whitespace before calculating SHA-256.
 
-* Registration
-* 2FA enablement
-* OTP delivery through the mock SMS adapter
-* Password and OTP-based login
-* Protected API access
-* Refresh-token flow
-* Forgot-password and password-reset flow
-* Automated tests
-* Security implementation
-* Docker setup
+The proof will be independently verified using the included public key.
+
+## Proof Verification
+
+The verification process checks that:
+
+1. `challenge.txt` contains the generated challenge.
+2. The repository commit hash is obtained using `git rev-parse HEAD`.
+3. The challenge and commit hash are concatenated exactly without whitespace.
+4. SHA-256 is calculated over that exact concatenation.
+5. The resulting digest is verified using the ECDSA public key.
+6. The signature in `proof.txt` is valid for that digest.
+
+The final verification output will be recorded here.
+
+## Submission Video
+
+The required demonstration video will be no longer than six minutes.
+
+The video will demonstrate:
+
+1. Registration
+2. Enabling 2FA
+3. OTP delivery through the mock SMS adapter
+4. Login using password and 2FA OTP
+5. Access token usage
+6. Protected endpoint access
+7. Refresh token flow
+8. Forgot-password request
+9. Password reset
+10. Developer Tools
+11. OTP generation and verification logic
+12. Relevant authentication implementation
+13. Automated tests
 
 Video link:
 
+```text
 To be added before final submission.
+```
 
 ## Repository
 
 GitHub repository:
 
+```text
 To be added before final submission.
+```
 
+## Final Submission Verification
+
+Before submitting, verify:
+
+```powershell
+git status
+git rev-parse HEAD
+```
+
+Then verify that the repository contains:
+
+```text
+README.md
+SUBMISSION.md
+CHECKLIST.md
+docker-compose.yml
+PROOF_OF_SUBMISSION/challenge.txt
+PROOF_OF_SUBMISSION/compute_proof.sh
+PROOF_OF_SUBMISSION/proof.txt
+PROOF_OF_SUBMISSION/proof_pub.pem
+```
+
+The final Git commit hash and proof outputs must be recorded in this document before submission.
