@@ -319,9 +319,7 @@ The key is not stored in the GitHub repository's source code or `.env` files.
 
 For local development, configure the same variable in the local `.env` file:
 
-```text
-DEV_ENDPOINT_KEY=YOUR_DEV_ENDPOINT_KEY
-```
+
 
 The Developer Tools feature is intended for development and evaluation purposes.
 
