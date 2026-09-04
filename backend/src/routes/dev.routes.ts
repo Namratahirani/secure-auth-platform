@@ -5,9 +5,11 @@ import {
   getMockEmailsEndpoint,
 } from "../controllers/dev.controller.js";
 
+import { devAuthMiddleware } from "../middleware/dev-auth.middleware.js";
+
 const router = Router();
 
-router.get("/otps", getMockOtps);
-router.get("/emails", getMockEmailsEndpoint);
+router.get("/otps", devAuthMiddleware, getMockOtps);
+router.get("/emails", devAuthMiddleware, getMockEmailsEndpoint);
 
 export default router;
