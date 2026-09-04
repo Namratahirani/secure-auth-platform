@@ -261,13 +261,13 @@ The private signing key is not included in the submission.
 The proof was generated against the repository HEAD commit at the time of proof generation:
 
 ```text
-Commit hash: 893d924cc1d003baaf38ba099a45c97ab891c043
+Commit hash: f154d79ec298cb33f4008dbfdc32eede07eee72f
 ```
 
 The SHA-256 digest of the concatenated challenge and commit hash was:
 
 ```text
-3403b5a913f48abf2b63c6c19da14a9ea0bcc84c431d7d143d905d333202f12d
+f4c552688baf0ff0d5c74e36389e03f7f75dfc2308d9c6f3fc75c5ff33498ca6
 ```
 
 To independently reproduce the digest calculation:
@@ -307,3 +307,4 @@ To be added before final submission.
 GitHub repository:
 
 To be added before final submission.
+
