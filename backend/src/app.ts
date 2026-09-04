@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
 import path from "path";
+import devRoutes from "./routes/dev.routes.js";
+import totpRoutes from "./routes/totp.routes.js";
+import totpLoginRoutes from "./routes/totp-login.routes.js";
 
 dotenv.config({
   path: path.resolve(process.cwd(), "../.env"),
@@ -14,6 +17,7 @@ import twofaLoginRoutes from "./routes/twofa-login.routes.js";
 import passwordResetRoutes from "./routes/password-reset.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+
 const app = express();
 
 app.use(
@@ -36,5 +40,11 @@ app.use("/api/auth/2fa-login", twofaLoginRoutes);
 app.use("/api/auth", passwordResetRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth/totp", totpRoutes);
+app.use("/api/auth/totp-login", totpLoginRoutes);
+
+if (process.env.ENABLE_DEV_ENDPOINTS === "true") {
+  app.use("/api/dev", devRoutes);
+}
 
 export default app;

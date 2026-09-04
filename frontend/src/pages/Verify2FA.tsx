@@ -39,13 +39,13 @@ export default function Verify2FA() {
     setLoading(true);
 
     try {
-      // complete2FA now returns the authenticated user's role
+      
       const role = await complete2FA(
         twoFactorToken,
         otp
       );
 
-      // Redirect based on the role returned by the backend
+    
       if (role === "ADMIN") {
         navigate("/admin");
       } else {
@@ -69,7 +69,7 @@ export default function Verify2FA() {
         <div className="auth-brand">
           <div>
             <div className="brand-badge">
-              🔐 Secure verification
+               Secure verification
             </div>
 
             <h1
@@ -104,7 +104,7 @@ export default function Verify2FA() {
 
             <p className="progress-footer">
               Your account is protected with two-factor
-              authentication 🛡️
+              authentication 
             </p>
           </div>
         </div>

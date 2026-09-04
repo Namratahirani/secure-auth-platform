@@ -22,6 +22,9 @@ model User {
   otps           OTP[]
   passwordResets PasswordReset[]
   auditLogs      AuditLog[]
+
+  totpSecret      String?
+isTotpEnabled   Boolean @default(false)
 }
 
 model RefreshToken {

@@ -1667,3 +1667,199 @@ body {
   }
 
 }
+
+
+.auth-link {
+  color: var(--yellow);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.form-label-row .auth-link {
+  font-size: 12px;
+  font-weight: 500;
+}
+.brand-heading {
+  font-size: clamp(40px, 4.5vw, 60px);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   TOTP AUTHENTICATOR SETUP
+   ========================================================= */
+
+.totp-setup-btn {
+  margin-left: 10px;
+
+  padding: 10px 15px;
+
+  border: 1px solid #333333;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #cccccc;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.totp-setup-btn:hover:not(:disabled) {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.totp-setup-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.totp-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  backdrop-filter: blur(6px);
+}
+
+.totp-modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 430px;
+
+  padding: 32px;
+
+  background: #111111;
+
+  border: 1px solid #292929;
+  border-radius: 18px;
+
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.55);
+}
+
+.totp-modal h2 {
+  font-size: 22px;
+  font-weight: 650;
+
+  letter-spacing: -0.03em;
+}
+
+.totp-description {
+  margin-top: 8px;
+
+  color: #858585;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.totp-close {
+  position: absolute;
+
+  top: 14px;
+  right: 16px;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #777777;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+.totp-close:hover {
+  color: #ffffff;
+}
+
+.totp-qr {
+  width: 210px;
+  height: 210px;
+
+  margin: 24px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+
+  border-radius: 12px;
+}
+
+.totp-manual {
+  margin-top: 8px;
+
+  color: #777777;
+
+  font-size: 11px;
+}
+
+.totp-secret {
+  margin-top: 7px;
+
+  padding: 10px;
+
+  background: #181818;
+
+  border: 1px solid #292929;
+
+  border-radius: 8px;
+
+  color: var(--yellow);
+
+  font-family: monospace;
+
+  font-size: 11px;
+
+  word-break: break-all;
+
+  text-align: center;
+}
+
+.totp-modal .form-group {
+  margin-top: 20px;
+}
+
+.totp-modal .form-group input {
+  text-align: center;
+
+  letter-spacing: 0.25em;
+
+  font-size: 18px;
+}
+
+@media (max-width: 600px) {
+  .totp-setup-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .totp-modal {
+    padding: 26px 20px;
+  }
+}

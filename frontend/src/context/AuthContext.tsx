@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -6,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+
 import api from "../services/api";
 
 interface User {
@@ -14,6 +14,14 @@ interface User {
   phone: string;
   role: "USER" | "ADMIN";
   is2FAEnabled: boolean;
+  isTotpEnabled: boolean;
+}
+
+interface LoginResult {
+  requires2FA: boolean;
+  requiresTOTP: boolean;
+  twoFactorToken?: string;
+  role?: "USER" | "ADMIN";
 }
 
 interface AuthContextType {
@@ -24,15 +32,16 @@ interface AuthContextType {
   login: (
     email: string,
     password: string
-  ) => Promise<{
-    requires2FA: boolean;
-    twoFactorToken?: string;
-    role?: "USER" | "ADMIN";
-  }>;
+  ) => Promise<LoginResult>;
 
   complete2FA: (
     twoFactorToken: string,
     otp: string
+  ) => Promise<"USER" | "ADMIN">;
+
+  completeTOTP: (
+    twoFactorToken: string,
+    token: string
   ) => Promise<"USER" | "ADMIN">;
 
   logout: () => Promise<void>;
@@ -74,7 +83,10 @@ export function AuthProvider({
 
         setUser(response.data.user);
       } catch (error) {
-        console.error("Failed to restore user session:", error);
+        console.error(
+          "Failed to restore user session:",
+          error
+        );
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -88,24 +100,38 @@ export function AuthProvider({
     loadUser();
   }, [accessToken]);
 
+  // =========================================================
+  // LOGIN
+  // =========================================================
+
   const login = async (
     email: string,
     password: string
-  ) => {
+  ): Promise<LoginResult> => {
     const response = await api.post("/auth/login", {
       email,
       password,
     });
 
-    // 2FA required
-    if (response.data.requires2FA) {
+    // TOTP required
+    if (response.data.requiresTOTP) {
       return {
-        requires2FA: true,
+        requires2FA: false,
+        requiresTOTP: true,
         twoFactorToken: response.data.twoFactorToken,
       };
     }
 
-    // Store access token
+    // SMS 2FA required
+    if (response.data.requires2FA) {
+      return {
+        requires2FA: true,
+        requiresTOTP: false,
+        twoFactorToken: response.data.twoFactorToken,
+      };
+    }
+
+    // Normal login
     setAccessToken(response.data.accessToken);
 
     localStorage.setItem(
@@ -113,7 +139,6 @@ export function AuthProvider({
       response.data.accessToken
     );
 
-    // Store refresh token
     setRefreshToken(response.data.refreshToken);
 
     localStorage.setItem(
@@ -121,14 +146,18 @@ export function AuthProvider({
       response.data.refreshToken
     );
 
-    // Store authenticated user
     setUser(response.data.user);
 
     return {
       requires2FA: false,
+      requiresTOTP: false,
       role: response.data.user.role,
     };
   };
+
+  // =========================================================
+  // SMS 2FA
+  // =========================================================
 
   const complete2FA = async (
     twoFactorToken: string,
@@ -142,7 +171,6 @@ export function AuthProvider({
       }
     );
 
-    // Store access token
     setAccessToken(response.data.accessToken);
 
     localStorage.setItem(
@@ -150,7 +178,6 @@ export function AuthProvider({
       response.data.accessToken
     );
 
-    // Store refresh token
     setRefreshToken(response.data.refreshToken);
 
     localStorage.setItem(
@@ -158,11 +185,49 @@ export function AuthProvider({
       response.data.refreshToken
     );
 
-    // Store authenticated user
     setUser(response.data.user);
 
     return response.data.user.role;
   };
+
+  // =========================================================
+  // TOTP
+  // =========================================================
+
+  const completeTOTP = async (
+    twoFactorToken: string,
+    token: string
+  ): Promise<"USER" | "ADMIN"> => {
+    const response = await api.post(
+      "/auth/totp-login/verify",
+      {
+        twoFactorToken,
+        token,
+      }
+    );
+
+    setAccessToken(response.data.accessToken);
+
+    localStorage.setItem(
+      "accessToken",
+      response.data.accessToken
+    );
+
+    setRefreshToken(response.data.refreshToken);
+
+    localStorage.setItem(
+      "refreshToken",
+      response.data.refreshToken
+    );
+
+    setUser(response.data.user);
+
+    return response.data.user.role;
+  };
+
+  // =========================================================
+  // LOGOUT
+  // =========================================================
 
   const logout = async () => {
     try {
@@ -172,9 +237,11 @@ export function AuthProvider({
         });
       }
     } catch (error) {
-      console.error("Logout request failed:", error);
+      console.error(
+        "Logout request failed:",
+        error
+      );
     } finally {
-      // Clear local authentication state
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
@@ -192,6 +259,7 @@ export function AuthProvider({
         refreshToken,
         login,
         complete2FA,
+        completeTOTP,
         logout,
       }}
     >
@@ -211,4 +279,3 @@ export function useAuth() {
 
   return context;
 }
-

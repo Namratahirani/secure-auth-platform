@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import prisma from "../config/prisma.js";
+import { sendPasswordResetEmail } from "../adapters/mock-email.adapter.js";
 
 export const createPasswordResetToken = async (email: string) => {
   const user = await prisma.user.findUnique({
@@ -44,14 +45,11 @@ await prisma.passwordReset.create({
 
 
   const resetLink =
-    `http://localhost:5173/reset-password?token=${resetToken}`;
+  `http://localhost:5173/reset-password?token=${resetToken}`;
 
-  console.log("=================================");
-  console.log("PASSWORD RESET LINK:");
-  console.log(resetLink);
-  console.log("=================================");
+await sendPasswordResetEmail(email, resetLink);
 
-  return resetToken;
+return resetToken;
 };
 
 export const resetPassword = async (

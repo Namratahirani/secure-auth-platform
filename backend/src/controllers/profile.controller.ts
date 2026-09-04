@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma.js";
 
-export const getProfile = async (req: Request, res: Response) => {
+export const getProfile = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const userId = req.user?.userId;
 
     if (!userId) {
       return res.status(401).json({
-        message: "Unauthorized"
+        message: "Unauthorized",
       });
     }
 
@@ -19,26 +22,32 @@ export const getProfile = async (req: Request, res: Response) => {
         phone: true,
         role: true,
         isActive: true,
+
+        // SMS 2FA
         is2FAEnabled: true,
+
+        // Authenticator / TOTP
+        isTotpEnabled: true,
+
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
 
     if (!user) {
       return res.status(404).json({
-        message: "User not found"
+        message: "User not found",
       });
     }
 
     return res.status(200).json({
-      user
+      user,
     });
   } catch (error) {
     console.error("Get profile error:", error);
 
     return res.status(500).json({
-      message: "Internal server error"
+      message: "Internal server error",
     });
   }
 };

@@ -109,35 +109,53 @@ export const login = async (
       throw error;
     }
 
-    if (user.is2FAEnabled) {
-      if (!user.phone) {
-        return res.status(400).json({
-          message: "Phone number is required for 2FA",
-        });
-      }
+    if (user.isTotpEnabled) {
+  const twoFactorToken = generateTwoFactorToken(
+    user.id
+  );
 
-      await generateAndSendOtp(
-        user.id,
-        user.phone,
-        "LOGIN_2FA"
-      );
+  await createAuditLog({
+    userId: user.id,
+    action: "LOGIN_TOTP_REQUIRED",
+    ...getAuditContext(req),
+  });
 
-      const twoFactorToken = generateTwoFactorToken(
-        user.id
-      );
+  return res.status(200).json({
+    message: "TOTP verification required",
+    requiresTOTP: true,
+    twoFactorToken,
+  });
+}
 
-      await createAuditLog({
-        userId: user.id,
-        action: "LOGIN_2FA_REQUIRED",
-        ...getAuditContext(req),
-      });
+if (user.is2FAEnabled) {
+  if (!user.phone) {
+    return res.status(400).json({
+      message: "Phone number is required for 2FA",
+    });
+  }
 
-      return res.status(200).json({
-        message: "OTP required",
-        requires2FA: true,
-        twoFactorToken,
-      });
-    }
+  await generateAndSendOtp(
+    user.id,
+    user.phone,
+    "LOGIN_2FA"
+  );
+
+  const twoFactorToken = generateTwoFactorToken(
+    user.id
+  );
+
+  await createAuditLog({
+    userId: user.id,
+    action: "LOGIN_2FA_REQUIRED",
+    ...getAuditContext(req),
+  });
+
+  return res.status(200).json({
+    message: "OTP required",
+    requires2FA: true,
+    twoFactorToken,
+  });
+}
 
     const accessToken = generateAccessToken({
       userId: user.id,

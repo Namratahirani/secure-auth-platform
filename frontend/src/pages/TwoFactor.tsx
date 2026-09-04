@@ -85,13 +85,13 @@ function TwoFactor() {
     <div className="auth-wrapper">
       <div className="auth-container">
         <div className="auth-brand">
-          <div className="brand-badge">🔐 Secure your account</div>
+          <div className="brand-badge">Secure your account</div>
 
           <div>
             <h1 className="brand-heading">
               One more step.
               <br />
-              <span>Stay protected.</span> 🛡️
+              <span>Stay protected.</span> 
             </h1>
 
             <p className="brand-subtext">
@@ -141,7 +141,7 @@ function TwoFactor() {
           {step === "enable" ? (
             <div className="auth-form">
               <div className="security-info">
-                <div className="card-icon">📱</div>
+                
 
                 <p>
                   We'll send a one-time verification code to your

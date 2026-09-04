@@ -9,6 +9,7 @@ import { validate } from "../middleware/validate.middleware.js";
 
 import {
   forgotPasswordRateLimiter,
+  resetPasswordRateLimiter,
 } from "../middleware/rate-limit.middleware.js";
 
 import {
@@ -27,6 +28,7 @@ router.post(
 
 router.post(
   "/reset-password",
+  resetPasswordRateLimiter,
   validate(resetPasswordSchema),
   resetPasswordController
 );

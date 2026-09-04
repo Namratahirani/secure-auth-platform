@@ -6,8 +6,10 @@ import {
   refreshToken,
   logout,
 } from "../controllers/auth.controller.js";
+
 import {
   loginRateLimiter,
+  refreshTokenRateLimiter,
 } from "../middleware/rate-limit.middleware.js";
 
 import { validate } from "../middleware/validate.middleware.js";
@@ -36,6 +38,7 @@ router.post(
 
 router.post(
   "/token/refresh",
+  refreshTokenRateLimiter,
   validate(refreshTokenSchema),
   refreshToken
 );

@@ -1,7 +1,7 @@
 
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import TwoFactor from "./pages/TwoFactor";
@@ -11,6 +11,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import VerifyTOTP from "./pages/VerifyTOTP";
 
 function App() {
   return (
@@ -26,6 +27,12 @@ function App() {
         path="/login"
         element={<Login />}
       />
+
+      <Route
+  path="/verify-totp"
+  element={<VerifyTOTP />}
+/>
+
 
       <Route
         path="/register"

@@ -22,17 +22,23 @@ export default function Login() {
     try {
       const result = await login(email, password);
 
-      if (result.requires2FA) {
-        navigate("/verify-2fa", {
-          state: {
-            twoFactorToken: result.twoFactorToken,
-          },
-        });
-      } else if (result.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
+if (result.requiresTOTP) {
+  navigate("/verify-totp", {
+    state: {
+      twoFactorToken: result.twoFactorToken,
+    },
+  });
+} else if (result.requires2FA) {
+  navigate("/verify-2fa", {
+    state: {
+      twoFactorToken: result.twoFactorToken,
+    },
+  });
+} else if (result.role === "ADMIN") {
+  navigate("/admin");
+} else {
+  navigate("/dashboard");
+}
     } catch (err: any) {
       setError(
         err.response?.data?.message ||

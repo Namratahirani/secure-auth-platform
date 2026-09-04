@@ -8,30 +8,59 @@ export const generateAndSendOtp = async (
   phone: string,
   purpose: string
 ) => {
-  //GENERATE RANDOM OTP
+  /*
+   * Invalidate previous unused OTPs for
+   * the same purpose.
+   */
+  await prisma.oTP.updateMany({
+    where: {
+      userId,
+      purpose,
+      used: false,
+    },
+    data: {
+      used: true,
+    },
+  });
+
+  /*
+   * Generate cryptographically secure
+   * six-digit OTP.
+   */
   const otp = crypto
     .randomInt(100000, 1000000)
     .toString();
 
- 
-  const codeHash = await bcrypt.hash(otp, 10);
+  /*
+   * Never store the OTP itself.
+   * Store only a bcrypt hash.
+   */
+  const codeHash = await bcrypt.hash(
+    otp,
+    10
+  );
 
-  
+  /*
+   * OTP expires after 5 minutes.
+   */
   const expiresAt = new Date(
     Date.now() + 5 * 60 * 1000
   );
 
-  
   await prisma.oTP.create({
     data: {
       userId,
       codeHash,
       purpose,
       expiresAt,
+      attempts: 0,
+      used: false,
     },
   });
 
-  // Send OTP through mock SMS
+  /*
+   * Mock SMS adapter logs the OTP locally.
+   */
   await sendOtpSms(phone, otp);
 };
 
@@ -40,34 +69,54 @@ export const verifyOtp = async (
   otp: string,
   purpose: string
 ) => {
-  const otpRecord = await prisma.oTP.findFirst({
-    where: {
-      userId,
-      purpose,
-      used: false,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const otpRecord =
+    await prisma.oTP.findFirst({
+      where: {
+        userId,
+        purpose,
+        used: false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
   if (!otpRecord) {
-    throw new Error("No valid OTP found");
+    throw new Error(
+      "No valid OTP found"
+    );
   }
 
-  if (otpRecord.expiresAt < new Date()) {
-    throw new Error("OTP has expired");
+  /*
+   * Check expiry.
+   */
+  if (
+    otpRecord.expiresAt < new Date()
+  ) {
+    throw new Error(
+      "OTP has expired"
+    );
   }
 
+  /*
+   * Maximum 5 attempts.
+   */
   if (otpRecord.attempts >= 5) {
-    throw new Error("Too many OTP attempts");
+    throw new Error(
+      "Too many OTP attempts"
+    );
   }
 
-  const isValid = await bcrypt.compare(
-    otp,
-    otpRecord.codeHash
-  );
+  const isValid =
+    await bcrypt.compare(
+      otp,
+      otpRecord.codeHash
+    );
 
+  /*
+   * Incorrect OTP:
+   * increment attempt counter.
+   */
   if (!isValid) {
     await prisma.oTP.update({
       where: {
@@ -80,10 +129,15 @@ export const verifyOtp = async (
       },
     });
 
-    throw new Error("Invalid OTP");
+    throw new Error(
+      "Invalid OTP"
+    );
   }
 
-  
+  /*
+   * Correct OTP:
+   * immediately mark as used.
+   */
   await prisma.oTP.update({
     where: {
       id: otpRecord.id,
@@ -93,7 +147,10 @@ export const verifyOtp = async (
     },
   });
 
-
+  /*
+   * Enable SMS 2FA only after
+   * successful verification.
+   */
   if (purpose === "ENABLE_2FA") {
     await prisma.user.update({
       where: {
