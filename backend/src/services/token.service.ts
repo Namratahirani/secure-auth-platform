@@ -19,9 +19,7 @@ interface AccessTokenPayload {
   role: string;
 }
 
-/*
- * Short-lived JWT access token.
- */
+
 export const generateAccessToken = (
   payload: AccessTokenPayload
 ) => {
@@ -30,12 +28,7 @@ export const generateAccessToken = (
   });
 };
 
-/*
- * Generate and store a hashed refresh token.
- *
- * The raw refresh token is returned to the client.
- * Only its SHA-256 hash is stored in PostgreSQL.
- */
+
 export const generateRefreshToken = async (
   userId: string,
   deviceInfo?: string,
@@ -67,16 +60,7 @@ export const generateRefreshToken = async (
   return refreshToken;
 };
 
-/*
- * Refresh-token rotation.
- *
- * Every successful refresh:
- * 1. Old token is revoked.
- * 2. New refresh token is created.
- * 3. Old token points to replacement.
- *
- * Reusing an already-rotated token is detected.
- */
+
 export const refreshAccessToken = async (
   refreshToken: string
 ) => {
@@ -99,12 +83,7 @@ export const refreshAccessToken = async (
     throw new Error("Invalid refresh token");
   }
 
-  /*
-   * If a revoked token has replacedByTokenId,
-   * it means this token was already rotated.
-   *
-   * Presenting it again = token reuse.
-   */
+ 
   if (storedToken.revoked) {
   if (storedToken.replacedByTokenId) {
     await createAuditLog({
@@ -131,9 +110,7 @@ export const refreshAccessToken = async (
     );
   }
 
-  /*
-   * Generate replacement refresh token.
-   */
+  
   const newRefreshToken = crypto
     .randomBytes(64)
     .toString("hex");
@@ -154,23 +131,15 @@ export const refreshAccessToken = async (
         tokenHash: newTokenHash,
         expiresAt: newExpiresAt,
 
-        /*
-         * Preserve device information.
-         */
+       
         deviceInfo: storedToken.deviceInfo,
 
-        /*
-         * Store the IP associated with the
-         * new refresh-token generation.
-         */
+       
         ipAddress: storedToken.ipAddress,
       },
     });
 
-  /*
-   * Revoke old refresh token and link it
-   * to the replacement.
-   */
+ 
   await prisma.refreshToken.update({
     where: {
       id: storedToken.id,
@@ -192,9 +161,7 @@ export const refreshAccessToken = async (
   };
 };
 
-/*
- * Logout / explicit refresh-token revocation.
- */
+
 export const revokeRefreshToken = async (
   refreshToken: string
 ) => {
@@ -230,11 +197,7 @@ export const revokeRefreshToken = async (
   });
 };
 
-/*
- * Temporary JWT used during 2FA login.
- *
- * It is NOT the normal access token.
- */
+
 export const generateTwoFactorToken = (
   userId: string
 ) => {

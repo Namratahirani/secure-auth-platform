@@ -28,7 +28,7 @@ export const sendPasswordResetEmail = async (
     createdAt: new Date(),
   });
 
-  // Keep only the latest 20 mock emails
+  
   if (mockEmails.length > 20) {
     mockEmails.shift();
   }

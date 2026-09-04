@@ -1,10 +1,6 @@
 import rateLimit from "express-rate-limit";
 
-/*
- * LOGIN
- *
- * Protect against password brute-force attacks.
- */
+
 export const loginRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
@@ -16,11 +12,7 @@ export const loginRateLimiter = rateLimit({
   },
 });
 
-/*
- * REGISTRATION
- *
- * Prevent automated account creation.
- */
+
 export const registerRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
@@ -32,11 +24,7 @@ export const registerRateLimiter = rateLimit({
   },
 });
 
-/*
- * OTP
- *
- * Protect OTP verification and generation.
- */
+
 export const otpRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
@@ -48,11 +36,7 @@ export const otpRateLimiter = rateLimit({
   },
 });
 
-/*
- * REFRESH TOKEN
- *
- * Prevent excessive token refresh requests.
- */
+
 export const refreshTokenRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
@@ -64,11 +48,7 @@ export const refreshTokenRateLimiter = rateLimit({
   },
 });
 
-/*
- * FORGOT PASSWORD
- *
- * Also helps prevent email/OTP abuse.
- */
+
 export const forgotPasswordRateLimiter =
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -81,9 +61,7 @@ export const forgotPasswordRateLimiter =
     },
   });
 
-/*
- * RESET PASSWORD
- */
+
 export const resetPasswordRateLimiter =
   rateLimit({
     windowMs: 15 * 60 * 1000,
