@@ -614,10 +614,4 @@ The final submission video demonstrates:
 * Relevant authentication implementation
 * PostgreSQL database usage
 
-The final video link will be added before submission.
 
-## Repository
-
-GitHub repository:
-
-To be added before final submission.
